@@ -21,6 +21,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 // 3. Logic: Find Slack tabs and inject the activity pulse
 async function performPulse() {
+    //  Check if the user has paused the engine
+    const result = await chrome.storage.local.get(['enabled']);
+    if (result.enabled === false) {
+        console.log('Engine is currently paused via UI. Skipping pulse.');
+        return;
+    }
+
     // Security Check: Only pulse if the system is NOT idle/locked
     const systemState = await chrome.idle.queryState(60); // 60s threshold
     if (systemState !== 'active') {
